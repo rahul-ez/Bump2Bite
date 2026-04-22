@@ -5,15 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.bump2bite.ui.screens.DashboardScreen
-import com.example.bump2bite.ui.screens.PostpartumScreen
-import com.example.bump2bite.ui.screens.SplashScreen
-import com.example.bump2bite.ui.screens.TipsScreen
-import com.example.bump2bite.ui.screens.WelcomeScreen
+import com.example.bump2bite.ui.screens.*
 import com.example.bump2bite.ui.theme.Bump2BiteTheme
+import com.example.bump2bite.viewmodel.AppViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,53 +19,93 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Bump2BiteTheme {
-                AppNavigation()
+                val appViewModel: AppViewModel = viewModel()
+                AppNavigation(appViewModel)
             }
         }
     }
 }
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(viewModel: AppViewModel) {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Splash.route
+        startDestination = Screen.Login.route
     ) {
-        composable(Screen.Splash.route) {
-            SplashScreen(
-                onNavigateToWelcome = {
-                    navController.navigate(Screen.Welcome.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
+        composable(Screen.Login.route) {
+            LoginScreen(
+                viewModel = viewModel,
+                onNavigateToSignup = { navController.navigate(Screen.Signup.route) },
+                onLoginSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
             )
         }
-        composable(Screen.Welcome.route) {
-            WelcomeScreen(
-                onContinue = {
-                    navController.navigate(Screen.Dashboard.route)
+        composable(Screen.Signup.route) {
+            SignupScreen(
+                viewModel = viewModel,
+                onSignupSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Signup.route) { inclusive = true }
+                    }
                 }
             )
         }
-        composable(Screen.Dashboard.route) {
+        composable(Screen.Home.route) {
             DashboardScreen(
-                onNavigateToTips = {
-                    navController.navigate(Screen.Tips.route)
+                viewModel = viewModel,
+                onNavigateToTest = { navController.navigate(Screen.Test.route) },
+                onNavigateToTips = { navController.navigate(Screen.Tips.route) },
+                onNavigateToProfile = { /* Navigate to profile */ },
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onTabSelected = { route ->
+                    if (route != "home") {
+                        navController.navigate(route)
+                    }
+                }
+            )
+        }
+        composable(Screen.Test.route) {
+            TestScreen(
+                viewModel = viewModel,
+                onTestComplete = {
+                    navController.navigate(Screen.Tips.route) {
+                        popUpTo(Screen.Test.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(Screen.Tracker.route) {
+            TrackerScreen(
+                viewModel = viewModel,
+                onTabSelected = { route ->
+                    if (route != "tracker") {
+                        navController.navigate(route) {
+                            popUpTo(Screen.Home.route)
+                        }
+                    }
                 }
             )
         }
         composable(Screen.Tips.route) {
             TipsScreen(
-                onBack = { navController.popBackStack() },
-                onNavigateToPostpartum = {
-                    navController.navigate(Screen.Postpartum.route)
+                viewModel = viewModel,
+                onTabSelected = { route ->
+                    if (route != "tips") {
+                        navController.navigate(route) {
+                            popUpTo(Screen.Home.route)
+                        }
+                    }
                 }
             )
-        }
-        composable(Screen.Postpartum.route) {
-            PostpartumScreen()
         }
     }
 }

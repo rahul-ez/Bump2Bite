@@ -1,9 +1,11 @@
 package com.example.bump2bite
 
 sealed class Screen(val route: String) {
-    object Splash : Screen("splash")
-    object Welcome : Screen("welcome")
-    object Dashboard : Screen("dashboard")
+    object Login : Screen("login")
+    object Signup : Screen("signup")
+    object Home : Screen("home")
+    object Test : Screen("test")
+    object Tracker : Screen("tracker")
     object Tips : Screen("tips")
-    object Postpartum : Screen("postpartum")
+    object Profile : Screen("profile")
 }

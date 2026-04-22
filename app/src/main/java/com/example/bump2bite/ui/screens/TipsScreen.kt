@@ -15,15 +15,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.bump2bite.ui.components.AppButton
 import com.example.bump2bite.ui.components.BottomNavigationBar
 import com.example.bump2bite.ui.theme.SoftTeal
 import com.example.bump2bite.ui.theme.TealPrimary
+import com.example.bump2bite.viewmodel.AppViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TipsScreen(onBack: () -> Unit, onNavigateToPostpartum: () -> Unit) {
+fun TipsScreen(viewModel: AppViewModel, onTabSelected: (String) -> Unit) {
     Scaffold(
-        bottomBar = { BottomNavigationBar(currentRoute = "tips") }
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("Oral Health Tips", fontWeight = FontWeight.Bold) }
+            )
+        },
+        bottomBar = { BottomNavigationBar(currentRoute = "tips", onNavigate = onTabSelected) }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -31,53 +37,25 @@ fun TipsScreen(onBack: () -> Unit, onNavigateToPostpartum: () -> Unit) {
                 .padding(padding)
                 .padding(horizontal = 24.dp)
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = "Tips",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Illustration and Risk Level
+            
+            // Video Placeholder
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = SoftTeal)
+                colors = CardDefaults.cardColors(containerColor = Color.Black)
             ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(16.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("Doctor\nImage", color = TealPrimary, fontSize = 12.sp)
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text("Risk Level", fontWeight = FontWeight.SemiBold)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Box(
-                            modifier = Modifier
-                                .background(TealPrimary, RoundedCornerShape(12.dp))
-                                .padding(horizontal = 12.dp, vertical = 4.dp)
-                        ) {
-                            Text("Mild", color = Color.White, fontWeight = FontWeight.Bold)
-                        }
-                    }
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("YouTube Video Player Placeholder", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Tips for Mild Caries Risk",
+                text = "Key Recommendations",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -85,41 +63,42 @@ fun TipsScreen(onBack: () -> Unit, onNavigateToPostpartum: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             LazyColumn(modifier = Modifier.weight(1f)) {
-                items(tips) { tip ->
+                items(tipsList) { tip ->
                     TipItem(tip)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            AppButton(text = "Got It", onClick = onNavigateToPostpartum)
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
 @Composable
 fun TipItem(tip: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = SoftTeal),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null,
-            tint = TealPrimary,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text = tip, style = MaterialTheme.typography.bodyLarge)
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = TealPrimary,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(text = tip, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        }
     }
 }
 
-val tips = listOf(
-    "Brush teeth twice a day with fluoridated toothpaste",
-    "Rinse mouth with water after snacking",
-    "Visit the dentist for routine cleanings",
-    "Floss daily to remove plaque between teeth"
+val tipsList = listOf(
+    "Brush twice daily with fluoridated toothpaste",
+    "Reduce sugar intake, especially between meals",
+    "Visit your dentist regularly, ideally in the 2nd trimester",
+    "Rinse with water after consuming acidic foods",
+    "Use a soft-bristled toothbrush to protect gums"
 )
