@@ -8,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.bump2bite.screens.DashboardScreen
-import com.example.bump2bite.screens.PostpartumScreen
-import com.example.bump2bite.screens.SplashScreen
-import com.example.bump2bite.screens.TipsScreen
-import com.example.bump2bite.screens.WelcomeScreen
+import com.example.bump2bite.ui.screens.DashboardScreen
+import com.example.bump2bite.ui.screens.PostpartumScreen
+import com.example.bump2bite.ui.screens.SplashScreen
+import com.example.bump2bite.ui.screens.TipsScreen
+import com.example.bump2bite.ui.screens.WelcomeScreen
 import com.example.bump2bite.ui.theme.Bump2BiteTheme
 
 class MainActivity : ComponentActivity() {
