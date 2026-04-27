@@ -80,6 +80,11 @@ fun AppNavigation(viewModel: AppViewModel) {
                     navController.navigate(Screen.Tips.route) {
                         popUpTo(Screen.Test.route) { inclusive = true }
                     }
+                },
+                onBack = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
                 }
             )
         }

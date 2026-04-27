@@ -39,7 +39,7 @@ val assessmentQuestions = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TestScreen(viewModel: AppViewModel, onTestComplete: () -> Unit) {
+fun TestScreen(viewModel: AppViewModel, onTestComplete: () -> Unit, onBack: () -> Unit) {
     var currentQuestionIndex by remember { mutableStateOf(0) }
     var selectedAnswers by remember { mutableStateOf(MutableList(assessmentQuestions.size) { -1 }) }
     var showResult by remember { mutableStateOf(false) }
@@ -52,10 +52,14 @@ fun TestScreen(viewModel: AppViewModel, onTestComplete: () -> Unit) {
                 TopAppBar(
                     title = { Text("Oral Health Assessment", fontWeight = FontWeight.Bold) },
                     navigationIcon = {
-                        if (currentQuestionIndex > 0) {
-                            IconButton(onClick = { currentQuestionIndex-- }) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        IconButton(onClick = { 
+                            if (currentQuestionIndex > 0) {
+                                currentQuestionIndex-- 
+                            } else {
+                                onBack()
                             }
+                        }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                         }
                     }
                 )

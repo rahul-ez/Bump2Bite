@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.input.ImeAction
 import com.example.bump2bite.ui.components.AppButton
 import com.example.bump2bite.ui.components.AppTextField
 import com.example.bump2bite.ui.theme.TealPrimary
@@ -19,6 +20,7 @@ import com.example.bump2bite.viewmodel.AppViewModel
 fun LoginScreen(viewModel: AppViewModel, onNavigateToSignup: () -> Unit, onLoginSuccess: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val authError = viewModel.authError
 
     Column(
         modifier = Modifier
@@ -38,9 +40,25 @@ fun LoginScreen(viewModel: AppViewModel, onNavigateToSignup: () -> Unit, onLogin
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        AppTextField(value = email, onValueChange = { email = it }, label = "Email / Phone")
+        AppTextField(value = email, onValueChange = { email = it }, label = "Email")
         Spacer(modifier = Modifier.height(16.dp))
-        AppTextField(value = password, onValueChange = { password = it }, label = "Password", isPassword = true)
+        AppTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = "Password",
+            isPassword = true,
+            imeAction = ImeAction.Done,
+            onImeAction = {
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    viewModel.login(email, password, onLoginSuccess)
+                }
+            }
+        )
+
+        authError?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(it, color = Color.Red, fontSize = 12.sp)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = { /* Forgot Password */ }, modifier = Modifier.align(Alignment.End)) {
@@ -50,8 +68,7 @@ fun LoginScreen(viewModel: AppViewModel, onNavigateToSignup: () -> Unit, onLogin
         Spacer(modifier = Modifier.height(32.dp))
 
         AppButton(text = "Login", onClick = {
-            viewModel.login(email, password)
-            onLoginSuccess()
+            viewModel.login(email, password, onLoginSuccess)
         })
 
         Spacer(modifier = Modifier.height(16.dp))

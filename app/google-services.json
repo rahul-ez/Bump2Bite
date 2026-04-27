@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "867745651464",
+    "project_id": "bump2bite",
+    "storage_bucket": "bump2bite.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:867745651464:android:29f8fb3a29ac349a05aabd",
+        "android_client_info": {
+          "package_name": "com.example.bump2bite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4eszyLxYOFDJ-mFGRLHJ30j6I8nG1094"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -22,12 +22,15 @@ import com.example.bump2bite.viewmodel.UserProfile
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignupScreen(viewModel: AppViewModel, onSignupSuccess: () -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
     var trimester by remember { mutableStateOf("1") }
     var language by remember { mutableStateOf(Language.ENGLISH) }
     
+    val authError = viewModel.authError
     var expandedTrimester by remember { mutableStateOf(false) }
     var expandedLang by remember { mutableStateOf(false) }
 
@@ -46,6 +49,10 @@ fun SignupScreen(viewModel: AppViewModel, onSignupSuccess: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(24.dp))
 
+        AppTextField(value = email, onValueChange = { email = it }, label = "Email")
+        Spacer(modifier = Modifier.height(16.dp))
+        AppTextField(value = password, onValueChange = { password = it }, label = "Password", isPassword = true)
+        Spacer(modifier = Modifier.height(16.dp))
         AppTextField(value = name, onValueChange = { name = it }, label = "Full Name")
         Spacer(modifier = Modifier.height(16.dp))
         AppTextField(value = age, onValueChange = { age = it }, label = "Age")
@@ -115,11 +122,15 @@ fun SignupScreen(viewModel: AppViewModel, onSignupSuccess: () -> Unit) {
             }
         }
 
+        authError?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(it, color = Color.Red, fontSize = 12.sp)
+        }
+
         Spacer(modifier = Modifier.height(40.dp))
 
         AppButton(text = "Sign Up", onClick = {
-            viewModel.signup(UserProfile(name, age, trimester, city, language))
-            onSignupSuccess()
+            viewModel.signup(email, password, UserProfile(name, age, trimester, city, language), onSignupSuccess)
         })
     }
 }
