@@ -16,7 +16,8 @@ enum class Language {
 data class UserProfile(
     val name: String = "",
     val age: String = "",
-    val trimester: String = "1",
+    val expectedDeliveryDate: String = "",
+    val isDelivered: Boolean = false,
     val city: String = "",
     val language: Language = Language.ENGLISH
 )
@@ -24,7 +25,7 @@ data class UserProfile(
 class AppViewModel : ViewModel() {
     private val auth: FirebaseAuth = Firebase.auth
     
-    var userProfile by mutableStateOf(UserProfile())
+    var userProfile by mutableStateOf<UserProfile?>(null)
     var isLoggedIn by mutableStateOf(auth.currentUser != null)
     var currentLanguage by mutableStateOf(Language.ENGLISH)
     var riskScore by mutableIntStateOf(45) // Moderate default

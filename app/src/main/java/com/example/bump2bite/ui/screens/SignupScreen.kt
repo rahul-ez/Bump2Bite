@@ -4,8 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.foundation.clickable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +21,8 @@ import com.example.bump2bite.ui.theme.TealPrimary
 import com.example.bump2bite.viewmodel.AppViewModel
 import com.example.bump2bite.viewmodel.Language
 import com.example.bump2bite.viewmodel.UserProfile
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,12 +32,39 @@ fun SignupScreen(viewModel: AppViewModel, onSignupSuccess: () -> Unit) {
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var city by remember { mutableStateOf("") }
-    var trimester by remember { mutableStateOf("1") }
+    var expectedDeliveryDate by remember { mutableStateOf("") }
+    var isDelivered by remember { mutableStateOf(false) }
     var language by remember { mutableStateOf(Language.ENGLISH) }
     
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+    
     val authError = viewModel.authError
-    var expandedTrimester by remember { mutableStateOf(false) }
     var expandedLang by remember { mutableStateOf(false) }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                        expectedDeliveryDate = sdf.format(Date(it))
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -61,36 +93,57 @@ fun SignupScreen(viewModel: AppViewModel, onSignupSuccess: () -> Unit) {
         
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Trimester Dropdown
-        ExposedDropdownMenuBox(
-            expanded = expandedTrimester,
-            onExpandedChange = { expandedTrimester = !expandedTrimester }
+        Text("Have you delivered?", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(modifier = Modifier.height(8.dp))
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            OutlinedTextField(
-                value = "Trimester $trimester",
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Current Trimester") },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTrimester) },
-                modifier = Modifier.menuAnchor().fillMaxWidth(),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
-            )
-            ExposedDropdownMenu(
-                expanded = expandedTrimester,
-                onDismissRequest = { expandedTrimester = false }
+            SegmentedButton(
+                selected = isDelivered,
+                onClick = { isDelivered = true },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                colors = SegmentedButtonDefaults.colors(activeContainerColor = TealPrimary.copy(alpha = 0.1f), activeBorderColor = TealPrimary, activeContentColor = TealPrimary)
             ) {
-                listOf("1", "2", "3").forEach { t ->
-                    DropdownMenuItem(
-                        text = { Text("Trimester $t") },
-                        onClick = {
-                            trimester = t
-                            expandedTrimester = false
-                        }
-                    )
-                }
+                Text("Yes")
+            }
+            SegmentedButton(
+                selected = !isDelivered,
+                onClick = { isDelivered = false },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                colors = SegmentedButtonDefaults.colors(activeContainerColor = TealPrimary.copy(alpha = 0.1f), activeBorderColor = TealPrimary, activeContentColor = TealPrimary)
+            ) {
+                Text("No")
             }
         }
 
+        if (!isDelivered) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = expectedDeliveryDate,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Expected Delivery Date") },
+                    trailingIcon = {
+                        Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = "Select Date")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = TealPrimary,
+                        unfocusedBorderColor = Color.LightGray
+                    )
+                )
+                // Transparent overlay to catch clicks on the whole field
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(Color.Transparent)
+                        .clickable { showDatePicker = true }
+                )
+            }
+        }
+        
         Spacer(modifier = Modifier.height(16.dp))
 
         // Language Dropdown
@@ -130,7 +183,7 @@ fun SignupScreen(viewModel: AppViewModel, onSignupSuccess: () -> Unit) {
         Spacer(modifier = Modifier.height(40.dp))
 
         AppButton(text = "Sign Up", onClick = {
-            viewModel.signup(email, password, UserProfile(name, age, trimester, city, language), onSignupSuccess)
+            viewModel.signup(email, password, UserProfile(name, age, expectedDeliveryDate, isDelivered, city, language), onSignupSuccess)
         })
     }
 }

@@ -39,7 +39,8 @@ fun AppNavigation(viewModel: AppViewModel) {
                 viewModel = viewModel,
                 onNavigateToSignup = { navController.navigate(Screen.Signup.route) },
                 onLoginSuccess = {
-                    navController.navigate(Screen.Home.route) {
+                    val startRoute = if (viewModel.userProfile?.isDelivered == true) Screen.Postpartum.route else Screen.Home.route
+                    navController.navigate(startRoute) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
@@ -49,7 +50,8 @@ fun AppNavigation(viewModel: AppViewModel) {
             SignupScreen(
                 viewModel = viewModel,
                 onSignupSuccess = {
-                    navController.navigate(Screen.Home.route) {
+                    val startRoute = if (viewModel.userProfile?.isDelivered == true) Screen.Postpartum.route else Screen.Home.route
+                    navController.navigate(startRoute) {
                         popUpTo(Screen.Signup.route) { inclusive = true }
                     }
                 }
@@ -108,6 +110,16 @@ fun AppNavigation(viewModel: AppViewModel) {
                         navController.navigate(route) {
                             popUpTo(Screen.Home.route)
                         }
+                    }
+                }
+            )
+        }
+        composable(Screen.Postpartum.route) {
+            PostpartumScreen(
+                viewModel = viewModel,
+                onLogout = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             )
