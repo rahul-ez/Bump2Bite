@@ -45,7 +45,7 @@ fun TestScreen(viewModel: AppViewModel, onTestComplete: () -> Unit, onBack: () -
     var showResult by remember { mutableStateOf(false) }
 
     if (showResult) {
-        TestResultScreen(onViewTips = onTestComplete)
+        TestResultScreen(riskLevel = viewModel.calculatedRiskLevel, onViewTips = onTestComplete)
     } else {
         Scaffold(
             topBar = {
@@ -134,26 +134,34 @@ fun TestScreen(viewModel: AppViewModel, onTestComplete: () -> Unit, onBack: () -
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                AppButton(
-                    text = if (currentQuestionIndex == assessmentQuestions.size - 1) "Submit" else "Next",
-                    onClick = {
-                        if (currentQuestionIndex < assessmentQuestions.size - 1) {
-                            currentQuestionIndex++
-                        } else {
-                            // Calculate score logic here
-                            viewModel.riskScore = 35 // Just a dummy update
-                            showResult = true
-                        }
-                    },
-                    enabled = selectedAnswers[currentQuestionIndex] != -1
-                )
+                if (viewModel.isSavingAssessment) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                } else {
+                    AppButton(
+                        text = if (currentQuestionIndex == assessmentQuestions.size - 1) "Submit" else "Next",
+                        onClick = {
+                            if (currentQuestionIndex < assessmentQuestions.size - 1) {
+                                currentQuestionIndex++
+                            } else {
+                                viewModel.saveAssessment(
+                                    responses = selectedAnswers,
+                                    questions = assessmentQuestions.map { it.text },
+                                    onComplete = {
+                                        showResult = true
+                                    }
+                                )
+                            }
+                        },
+                        enabled = selectedAnswers[currentQuestionIndex] != -1
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun TestResultScreen(onViewTips: () -> Unit) {
+fun TestResultScreen(riskLevel: String, onViewTips: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -179,7 +187,7 @@ fun TestResultScreen(onViewTips: () -> Unit) {
             shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
         ) {
             Text(
-                "Moderate Risk",
+                riskLevel,
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFFBC02D)
